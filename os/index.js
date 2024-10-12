@@ -1,9 +1,7 @@
 import os from "os";
 
-const handleOSCommands = (input) => {
-    const [command, option] = input.split(' ');
-
-    if (command === 'os') {
+const handleOSCommands = (option) => {
+    try{
         switch (option) {
             case '--EOL':
                 process.stdout.write(JSON.stringify(os.EOL));
@@ -24,8 +22,10 @@ const handleOSCommands = (input) => {
                 console.log(os.arch());
                 break;
             default:
-                console.log('Invalid input');
+                throw new Error(`Invalid command: ${option} not found`)
         }
+    }catch (e) {
+        console.error(e.message)
     }
 };
 
