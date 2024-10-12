@@ -10,7 +10,12 @@ const rl = readline.createInterface({
 const currentDirectory = os.homedir();
 const printCurrentDirectory = () => {
     const args = process.argv.slice(2);
-    console.log(`Welcome to the File Manager ${}`)
+    // for(let i = 0 ; i < args.length;i++){
+    //     if(args[i].startsWith('--')){
+    //         parsedArgs[args[i].slice(2)] = args[++i];
+    //     }
+    // }
+    console.log(`Welcome to the File Manager ${args[0]}`)
     console.log(`You are currently in ${currentDirectory}`);
 };
 
@@ -18,8 +23,12 @@ printCurrentDirectory();
 
 rl.on('line', (input) => {
     const [command, option] = input.split(' ');
+
     if(command==='os'){
         handleOSCommands(option)
     }
+    printCurrentDirectory()
 }).on('close', () => {
-});
+    const args = process.argv.slice(2);
+    console.log(`Thank you for using File Manager, ${args[0]}, goodbye!`)
+})
