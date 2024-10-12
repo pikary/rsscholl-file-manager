@@ -1,4 +1,5 @@
 import readline from 'readline'
+import handleOSCommands from "./os/index.js";
 import os from 'os'
 
 const rl = readline.createInterface({
