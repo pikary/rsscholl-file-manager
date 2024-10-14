@@ -4,11 +4,6 @@ import fs from "fs";
 import fsAsync from 'fs/promises';
 import zlib from 'zlib';
 
-const isAboveHomeDirectory = (newPath) => {
-    const homedir = os.homedir()
-    const resolvedNewPath = path.resolve(newPath);
-    return !resolvedNewPath.startsWith(homedir);
-};
 
 const getFullPath = (currentDir, targetFile) => path.resolve(currentDir, targetFile);
 
@@ -22,7 +17,9 @@ async function catFile(currentDir, targetFile) {
             process.stdout.write(chunk);
         }
     });
-
+    readStream.on('end',()=>{
+        console.log('File has been read \n')
+    })
     readStream.on('error', (e) => {
         console.error(`Error reading file: ${e.message}`);
     });
@@ -55,11 +52,22 @@ async function moveFile(currentDir, targetFile, destination) {
     if (!sourceStats.isFile()) {
         throw new Error('Source is not a valid file.');
     }
-
     await fsAsync.copyFile(sourceFilePath, destinationPath);
     await fsAsync.unlink(sourceFilePath);
 
     console.log(`File moved from '${sourceFilePath}' to '${destinationPath}'`);
+}
+
+async function copyFile(currentDir, targetFile, destination) {
+    const sourceFilePath = getFullPath(currentDir, targetFile);
+    const destinationPath = path.resolve(currentDir, destination, path.basename(targetFile));
+    const sourceStats = await fsAsync.stat(sourceFilePath);
+    if (!sourceStats.isFile()) {
+        throw new Error('Source is not a valid file.');
+    }
+
+    await fsAsync.copyFile(sourceFilePath, destinationPath);
+    console.log(`File copied from '${sourceFilePath}' to '${destinationPath}'`);
 }
 
 // Remove file
@@ -103,10 +111,10 @@ async function decompressFile(currentDir, sourceFile, destinationFile) {
 
 
 export {
-    isAboveHomeDirectory,
     catFile,
     addFile,
     moveFile,
+    copyFile,
     removeFile,
     renameFile,
     compressFile,

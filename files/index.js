@@ -5,8 +5,9 @@ import {
     moveFile,
     removeFile,
     compressFile,
-    decompressFile
-} from "./helpers.js";
+    decompressFile, copyFile
+} from "./operations.js";
+import {printCurrentDirectory} from "../utils/helpers.js";
 
 async function handleFileCommands(input) {
     const [baseCommand, targetFile, destination] = input
@@ -22,13 +23,26 @@ async function handleFileCommands(input) {
 
             case 'rn':
                 if (!targetFile || !destination) {
-                    console.log('Invalid input: missing required parameters.');
+                    console.error('Invalid input: missing required parameters.');
+                    break
+
                 } else {
                     await renameFile(this.currentDir, targetFile, destination);
                 }
                 break;
+            case 'cp':
+                if (!targetFile || !destination) {
+                    console.error('Invalid input: missing required parameters.');
+                    break
 
+                }
+                await copyFile(this.currentDir,targetFile,destination);
+                break;
             case 'mv':
+                if (!targetFile || !destination) {
+                    console.error('Invalid input: missing required parameters.');
+                    break
+                }
                 await moveFile(this.currentDir, targetFile, destination);
                 break;
 
@@ -46,6 +60,8 @@ async function handleFileCommands(input) {
         }
     } catch (e) {
         console.error(e.message)
+    }finally {
+        printCurrentDirectory()
     }
 }
 

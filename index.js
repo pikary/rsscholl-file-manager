@@ -3,6 +3,10 @@ import handleOSCommands from "./os/index.js";
 import handleFileCommands from "./files/index.js";
 import {navigation} from "./navigation.js";
 import {handleHashOperations} from "./hash/index.js";
+import {isValidOperation, printCurrentDirectory} from "./utils/helpers.js";
+
+
+
 
 function initApplication() {
     try{
@@ -10,13 +14,7 @@ function initApplication() {
             input: process.stdin,
             output: process.stdout
         })
-        const printCurrentDirectory = () => {
-            const args = process.argv.slice(2);
-            console.log(`Welcome to the File Manager ${args[0]}`)
-            console.log(`You are currently in ${navigation.currentDir}`);
-        };
-        printCurrentDirectory();
-
+        printCurrentDirectory()
 
         const fileOperations = handleFileCommands.bind(navigation)
         const osOperations = handleOSCommands.bind(navigation)
@@ -26,9 +24,16 @@ function initApplication() {
         rl.on('line', async (input) => {
             const processedInput = input.split(' ')
             const [command, option] = processedInput
+            // Check if the command is valid
+            if (!isValidOperation(command)) {
+                console.error(new Error('Invalid command').message);
+            }
             switch (command) {
+                case '.exit':
+                    rl.close()
+                    break;
                 case 'ls':
-                    navigation.ls()
+                   await navigation.ls()
                     break;
                 case 'up':
                     navigation.up()
@@ -38,21 +43,20 @@ function initApplication() {
                     break
                 default :
                     if (command === 'os') {
-                        osOperations(option)
+                        await osOperations(option)
+                        // printCurrentDirectory()
                         break
                     } else if (command === 'hash') {
-                        hashOperations(option)
+                        await hashOperations(option)
+                        // printCurrentDirectory()
                         break;
                     }
-                    fileOperations(processedInput)
+                    await fileOperations(processedInput)
+                    // printCurrentDirectory()
                     break;
             }
-        }).on('history', (e) => {
-            console.log("\n")
-            printCurrentDirectory()
         }).on('close', () => {
-            const args = process.argv.slice(2);
-            console.log(`Thank you for using File Manager, ${args[0]}, goodbye!`)
+            console.log(`Thank you for using File Manager, ${username}, goodbye!`)
         })
     }catch (e) {
         console.error(e.message)
