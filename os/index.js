@@ -22,10 +22,10 @@ function handleOSCommands(option) {
                 console.log(os.arch());
                 break;
             default:
-                throw new Error(`Invalid command: ${option} not found`)
+                throw new Error(`Invalid command: ${option} not found`);
         }
     }catch (e) {
-        console.error(e.message)
+        console.error(e.message);
     }
 };
 

@@ -7,7 +7,7 @@ import {printCurrentDirectory} from "../utils/helpers.js";
 
 export function handleHashOperations(target){
     try{
-        const targetFilePath = path.resolve(this.currentDir, target)
+        const targetFilePath = path.resolve(this.currentDir, target);
 
         const hash = crypto.createHash('sha256');
         const readableStream = fs.createReadStream(targetFilePath, {encoding:'utf-8'});
@@ -22,9 +22,9 @@ export function handleHashOperations(target){
             console.error(`Error reading file: ${err.message}`);
         });
     }catch (e) {
-        console.error(e.message)
+        console.error(e.message);
     }finally {
-        printCurrentDirectory()
+        printCurrentDirectory();
     }
 
 }

@@ -10,7 +10,7 @@ import {
 import {printCurrentDirectory} from "../utils/helpers.js";
 
 async function handleFileCommands(input) {
-    const [baseCommand, targetFile, destination] = input
+    const [baseCommand, targetFile, destination] = input;
     try {
         switch (baseCommand) {
             case 'cat':
@@ -59,11 +59,11 @@ async function handleFileCommands(input) {
                 break;
         }
     } catch (e) {
-        console.error(e.message)
+        console.error(e.message);
     }finally {
-        printCurrentDirectory()
+        printCurrentDirectory();
     }
 }
 
 
-export default handleFileCommands
+export default handleFileCommands;
