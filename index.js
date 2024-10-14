@@ -6,6 +6,7 @@ import path from "path";
 import {isAboveHomeDirectory} from "./files/helpers.js";
 import fsAsync from "fs/promises";
 import {navigation} from "./navigation.js";
+import {handleHashOperations} from "./hash/index.js";
 
 function initApplication(){
     const rl = readline.createInterface({
@@ -23,6 +24,7 @@ function initApplication(){
 
     const fileOperations = handleFileCommands.bind(navigation)
     const osOperations = handleOSCommands.bind(navigation)
+    const hashOperations = handleHashOperations.bind(navigation)
 
 
 
@@ -45,6 +47,9 @@ function initApplication(){
                 if(command=== 'os'){
                     osOperations(option)
                     break
+                }else if(command === 'hash'){
+                    hashOperations(option)
+                    break;
                 }
                 fileOperations(processedInput)
                 break;
