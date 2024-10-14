@@ -42,7 +42,7 @@ function initApplication(){
                 break
             default :
                 if(input[0] === 'os'){
-                    osOperations(input[0])
+                    osOperations(input[1])
                 }
                 fileOperations(input)
                 break;
