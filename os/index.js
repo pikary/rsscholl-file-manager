@@ -1,6 +1,6 @@
 import os from "os";
 
-const handleOSCommands = (option) => {
+function handleOSCommands(option) {
     try{
         switch (option) {
             case '--EOL':

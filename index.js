@@ -20,6 +20,7 @@ function initApplication(){
     };
     printCurrentDirectory();
 
+
     const fileOperations = handleFileCommands.bind(navigation)
     const osOperations = handleOSCommands.bind(navigation)
 
@@ -39,8 +40,11 @@ function initApplication(){
             case 'cd':
                 await navigation.cd(option)
                 break
-            case 'os':
-                handleOSCommands(option)
+            default :
+                if(input[0] === 'os'){
+                    osOperations(input[0])
+                }
+                fileOperations(input)
                 break;
         }
 
