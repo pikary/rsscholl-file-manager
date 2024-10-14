@@ -20,10 +20,8 @@ function initApplication(){
     };
     printCurrentDirectory();
 
-
-
-
-
+    const fileOperations = handleFileCommands.bind(navigation)
+    const osOperations = handleOSCommands.bind(navigation)
 
 
 

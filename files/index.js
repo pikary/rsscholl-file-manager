@@ -2,32 +2,16 @@ import os from "os";
 import path from "path";
 import fs from "fs";
 import fsAsync from 'fs/promises'
-import {isAboveHomeDirectory} from "./helpers.js";
 import pipeline from 'stream'
 import {promisify} from 'util'
 
 
-async function handleFileCommands(option,currentPath){
-
+async function handleFileCommands(){
+    const [baseCommand, targetFile, destination] = arguments
     try {
-        switch (option) {
-            case 'up':
-                const parentDir = path.resolve(currentPath, '..');
-                // Prevent moving above the home directory
-                if (!isAboveHomeDirectory(parentDir)) {
-                    currentPath = parentDir;
-                } else {
-                    console.log('Cannot go above the home directory.');
-                }
-                break;
-            case 'ls':
-                const currentDir = await fsAsync.opendir(currentPath)
-                for await (const dirent of currentDir) {
-                    console.log(dirent);
-                }
-                break;
+        switch (baseCommand) {
             case 'cat':
-                const filePath = path.join(currentPath, command);
+                const filePath = path.join(this.currentDir, targetFile);
                 const readStream = fs.createReadStream(filePath)
                 readStream.on('readable', () => {
                     let chunk
@@ -36,45 +20,43 @@ async function handleFileCommands(option,currentPath){
                     }
                 });
                 readStream.on('error', () => {
-                    throw new Error(`Could not read stream: ${command}`);
+                    throw new Error(`Could not read stream}`);
                 })
                 break;
             case 'add':
-                //command это имя файла
-                const createStream = fs.createWriteStream(path.join(currentPath, command));
+                const createStream = fs.createWriteStream(path.join(this.currentDir, targetFile));
                 createStream.end(() => {
-                    console.log('File ' + command.toString() + ' successfuly created!')
+                    console.log('File ' + targetFile.toString() + ' successfuly created!')
                 })
                 break;
             case 'rn':
-                if (args.length === 0) {
-                    console.log('Invalid input: missing new filename.');
+                if (arguments.length > 3) {
+                    console.log('Invalid input: missing new required parameters');
                 } else {
-                    const oldFilePath = path.join(currentPath, command);
-                    const newFilePath = path.join(currentPath, args[0]);
+                    const oldFilePath = path.join(this.currentDir, targetFile);
+                    const newFilePath = path.join(this.currentDir, destination);
                     await fsAsync.rename(oldFilePath, newFilePath);
-                    console.log(`File renamed to ${args[0]}`);
+                    console.log(`File renamed to ${destination}`);
                 }
                 break;
             case 'mv':
-                const sourceFilePath = path.join(currentPath, command);
+                const sourceFilePath = path.join(this.currentDir, targetFile);
                 const asyncPipeline = promisify(pipeline)
-                const destinationPath = path.resolve(currentPath, args[0], path.basename(command));
+                const destinationPath = path.resolve(this.currentDir, destination, path.basename(targetFile));
 
                 asyncPipeline(
                     fs.createReadStream(sourceFilePath),
-                    //create copy with new name
                     fs.createWriteStream(destinationPath)
                 )
                 await fsAsync.unlink(sourceFilePath)
                 break;
             case 'rm': // Remove file
-                const deleteFilePath = path.join(currentPath, command);
+                const deleteFilePath = path.join(this.currentDir, targetFile);
                 await fsAsync.unlink(deleteFilePath);
-                console.log(`File ${command} removed.`);
+                console.log(`File ${targetFile} removed.`);
                 break;
             default:
-                throw new Error(`Invalid command: ${option} not found`)
+                throw new Error(`Invalid command not found`)
         }
     }catch (e) {
 
