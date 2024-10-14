@@ -27,7 +27,8 @@ function initApplication(){
 
 
     rl.on('line', async(input) => {
-        const [command, option] = input.split(' ');
+        const processedInput = input.split(' ')
+        const [command, option] = processedInput
         await handleFileCommands(input,currentDirectory)
 
         switch (command){
@@ -45,7 +46,7 @@ function initApplication(){
                     osOperations(option)
                     break
                 }
-                fileOperations(input)
+                fileOperations(processedInput)
                 break;
         }
 

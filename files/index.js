@@ -6,11 +6,13 @@ import pipeline from 'stream'
 import {promisify} from 'util'
 
 
-async function handleFileCommands(){
-    const [baseCommand, targetFile, destination] = arguments
+async function handleFileCommands(input){
+    const [baseCommand, targetFile, destination] = input
+    console.log(arguments)
     try {
         switch (baseCommand) {
             case 'cat':
+                console.log('IAM CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT')
                 const filePath = path.join(this.currentDir, targetFile);
                 const readStream = fs.createReadStream(filePath)
                 readStream.on('readable', () => {
@@ -19,8 +21,8 @@ async function handleFileCommands(){
                         process.stdout.write(chunk);
                     }
                 });
-                readStream.on('error', () => {
-                    throw new Error(`Could not read stream}`);
+                readStream.on('error', (e) => {
+                    throw new Error(e);
                 })
                 break;
             case 'add':
@@ -41,13 +43,18 @@ async function handleFileCommands(){
                 break;
             case 'mv':
                 const sourceFilePath = path.join(this.currentDir, targetFile);
-                const asyncPipeline = promisify(pipeline)
+
                 const destinationPath = path.resolve(this.currentDir, destination, path.basename(targetFile));
 
-                asyncPipeline(
-                    fs.createReadStream(sourceFilePath),
-                    fs.createWriteStream(destinationPath)
-                )
+                const sourceStats = await fsAsync.stat(sourceFilePath);
+                if (!sourceStats.isFile()) {
+                    console.log('Source is not a valid file.');
+                    return;
+                }
+                //copy to destionnaton
+                await fsAsync.copyFile(sourceFilePath, destinationPath);
+
+                //delete
                 await fsAsync.unlink(sourceFilePath)
                 break;
             case 'rm': // Remove file
@@ -59,7 +66,7 @@ async function handleFileCommands(){
                 throw new Error(`Invalid command not found`)
         }
     }catch (e) {
-
+        console.log(e)
     }
 }
 

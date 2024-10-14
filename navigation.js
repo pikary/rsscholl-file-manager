@@ -5,16 +5,16 @@ import {isAboveHomeDirectory} from "./files/helpers.js";
 
 export const navigation = {
     currentDir: os.homedir(),
-    cd:async function(targetPath){
+    cd: async function (targetPath) {
         const targetDir = path.resolve(this.currentDir, targetPath)
         const targetDirStats = await fsAsync.lstat(targetDir)
-        if(targetDirStats.isDirectory()){
+        if (targetDirStats.isDirectory()) {
             this.currentDir = targetDir
-        }else{
+        } else {
             console.log('This is not a directory')
         }
     },
-    up:function(){
+    up: function () {
         const parentDir = path.resolve(this.currentDir, '..');
         // Prevent moving above the home directory
         if (!isAboveHomeDirectory(parentDir)) {
@@ -23,7 +23,7 @@ export const navigation = {
             console.log('Cannot go above the home directory.');
         }
     },
-    ls:async function () {
+    ls: async function () {
         try {
             const dir = await fsAsync.opendir(this.currentDir);
             const dirFiles = [];
@@ -36,7 +36,7 @@ export const navigation = {
                     Type: dirent.isDirectory() ? 'directory' : 'file',
                 });
             }
-            console.table(dirFiles);
+            console.table(dirFiles.sort((a, b) => a.Type === 'file' ? -1:1));
         } catch (error) {
             console.error('Error reading directory:', error.message);
         }
