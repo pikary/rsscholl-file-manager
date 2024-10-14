@@ -41,8 +41,9 @@ function initApplication(){
                 await navigation.cd(option)
                 break
             default :
-                if(input[0] === 'os'){
-                    osOperations(input[1])
+                if(command=== 'os'){
+                    osOperations(option)
+                    break
                 }
                 fileOperations(input)
                 break;
