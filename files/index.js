@@ -43,12 +43,9 @@ async function handleFileCommands(input) {
             case 'decompress':
                 await decompressFile(this.currentDir, targetFile, destination);
                 break;
-
-            default:
-                throw new Error(`Invalid command: ${baseCommand}`);
         }
     } catch (e) {
-        console.log(e)
+        console.error(e.message)
     }
 }
 

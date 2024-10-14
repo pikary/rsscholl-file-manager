@@ -17,6 +17,6 @@ export function handleHashOperations(target){
         console.log(result);
     });
     readableStream.on('error', (err) => {
-        console.error('Error reading file:', err);
+        throw err
     });
 }
