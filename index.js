@@ -28,9 +28,25 @@ function initApplication(){
     rl.on('line', async(input) => {
         const [command, option] = input.split(' ');
         await handleFileCommands(input,currentDirectory)
-        if(command==='os'){
-            handleOSCommands(option)
+
+        switch (command){
+            case 'ls':
+                navigation.ls()
+                break;
+            case 'up':
+                navigation.up()
+                break;
+            case 'cd':
+                await navigation.cd(option)
+                break
+            case 'os':
+                handleOSCommands(option)
+                break;
         }
+
+        // if(command==='os'){
+        //     handleOSCommands(option)
+        // }
         printCurrentDirectory()
     }).on('close', () => {
         const args = process.argv.slice(2);
