@@ -1,5 +1,6 @@
 import readline from 'readline'
 import handleOSCommands from "./os/index.js";
+import handleFileCommands from "./files/index.js";
 import os from 'os'
 
 
@@ -21,9 +22,9 @@ const printCurrentDirectory = () => {
 
 printCurrentDirectory();
 
-rl.on('line', (input) => {
+rl.on('line', async(input) => {
     const [command, option] = input.split(' ');
-
+    await handleFileCommands(input,currentDirectory)
     if(command==='os'){
         handleOSCommands(option)
     }
