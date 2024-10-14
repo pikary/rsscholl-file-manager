@@ -4,7 +4,7 @@ import fs from "fs";
 import fsAsync from 'fs/promises'
 import pipeline from 'stream'
 import {promisify} from 'util'
-
+import zlib from 'zlib'
 
 async function handleFileCommands(input){
     const [baseCommand, targetFile, destination] = input
@@ -62,6 +62,16 @@ async function handleFileCommands(input){
                 await fsAsync.unlink(deleteFilePath);
                 console.log(`File ${targetFile} removed.`);
                 break;
+
+            case 'compress':
+                const sourceFilePath2 = path.resolve(this.currentDir, targetFile);
+                const destinationFilePath = path.resolve(this.currentDir, destination);
+                const readStream2 = fs.createReadStream(sourceFilePath2)
+                const writeStream = fs.createWriteStream(destinationFilePath);
+                const brotli = zlib.createBrotliCompress();
+                readStream2.pipe(brotli).pipe(writeStream)
+                break;
+
             default:
                 throw new Error(`Invalid command not found`)
         }
