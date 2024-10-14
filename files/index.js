@@ -1,85 +1,56 @@
-import os from "os";
-import path from "path";
-import fs from "fs";
-import fsAsync from 'fs/promises'
-import pipeline from 'stream'
-import {promisify} from 'util'
-import zlib from 'zlib'
+import {
+    catFile,
+    addFile,
+    renameFile,
+    moveFile,
+    removeFile,
+    compressFile,
+    decompressFile
+} from "./helpers.js";
 
-async function handleFileCommands(input){
+async function handleFileCommands(input) {
     const [baseCommand, targetFile, destination] = input
-    console.log(arguments)
     try {
         switch (baseCommand) {
             case 'cat':
-                console.log('IAM CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT')
-                const filePath = path.join(this.currentDir, targetFile);
-                const readStream = fs.createReadStream(filePath)
-                readStream.on('readable', () => {
-                    let chunk
-                    while (null !== (chunk = readStream.read())) {
-                        process.stdout.write(chunk);
-                    }
-                });
-                readStream.on('error', (e) => {
-                    throw new Error(e);
-                })
+                await catFile(this.currentDir, targetFile);
                 break;
+
             case 'add':
-                const createStream = fs.createWriteStream(path.join(this.currentDir, targetFile));
-                createStream.end(() => {
-                    console.log('File ' + targetFile.toString() + ' successfuly created!')
-                })
+                await addFile(this.currentDir, targetFile);
                 break;
+
             case 'rn':
-                if (arguments.length > 3) {
-                    console.log('Invalid input: missing new required parameters');
+                if (!targetFile || !destination) {
+                    console.log('Invalid input: missing required parameters.');
                 } else {
-                    const oldFilePath = path.join(this.currentDir, targetFile);
-                    const newFilePath = path.join(this.currentDir, destination);
-                    await fsAsync.rename(oldFilePath, newFilePath);
-                    console.log(`File renamed to ${destination}`);
+                    await renameFile(this.currentDir, targetFile, destination);
                 }
                 break;
+
             case 'mv':
-                const sourceFilePath = path.join(this.currentDir, targetFile);
-
-                const destinationPath = path.resolve(this.currentDir, destination, path.basename(targetFile));
-
-                const sourceStats = await fsAsync.stat(sourceFilePath);
-                if (!sourceStats.isFile()) {
-                    console.log('Source is not a valid file.');
-                    return;
-                }
-                //copy to destionnaton
-                await fsAsync.copyFile(sourceFilePath, destinationPath);
-
-                //delete
-                await fsAsync.unlink(sourceFilePath)
+                await moveFile(this.currentDir, targetFile, destination);
                 break;
-            case 'rm': // Remove file
-                const deleteFilePath = path.join(this.currentDir, targetFile);
-                await fsAsync.unlink(deleteFilePath);
-                console.log(`File ${targetFile} removed.`);
+
+            case 'rm':
+                await removeFile(this.currentDir, targetFile);
                 break;
 
             case 'compress':
-                const sourceFilePath2 = path.resolve(this.currentDir, targetFile);
-                const destinationFilePath = path.resolve(this.currentDir, destination);
-                const readStream2 = fs.createReadStream(sourceFilePath2)
-                const writeStream = fs.createWriteStream(destinationFilePath);
-                const brotli = zlib.createBrotliCompress();
-                readStream2.pipe(brotli).pipe(writeStream)
+                await compressFile(this.currentDir, targetFile, destination);
+                break;
+
+            case 'decompress':
+                await decompressFile(this.currentDir, targetFile, destination);
                 break;
 
             default:
-                throw new Error(`Invalid command not found`)
+                throw new Error(`Invalid command: ${baseCommand}`);
         }
-    }catch (e) {
+    } catch (e) {
         console.log(e)
     }
 }
-
 
 
 export default handleFileCommands
